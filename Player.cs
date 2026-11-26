@@ -15,6 +15,11 @@ class Player
     private float groundY;
     private bool isOnGround;
 
+    private bool isRolling;
+    private float rollTimer;
+    private float rollDuration;
+    private int rollHeight;
+
     private KeyboardState  previousKeyboard;
 
     //Constructor with Parameters
@@ -31,9 +36,14 @@ class Player
         gravity = 0.5f;
         jumpStrength = -12f;
         isOnGround = true;
+
+        isRolling = false;
+        rollTimer = 0;
+        rollDuration = 0.6f;
+        rollHeight = 55;
     }
     
-    public void Update()
+    public void Update(GameTime gameTime)
     {
         KeyboardState keyboard = Keyboard.GetState();
 
@@ -43,11 +53,33 @@ class Player
             (keyboard.IsKeyDown(Keys.W) && previousKeyboard.IsKeyUp(Keys.W)) ||
             (keyboard.IsKeyDown(Keys.Up) && previousKeyboard.IsKeyUp(Keys.Up)))
         {
-            if (isOnGround)
+            if (isOnGround && !isRolling)
             {
                 Jump();
             }
         }
+
+        //roll
+
+        if ((keyboard.IsKeyDown(Keys.S) && previousKeyboard.IsKeyUp(Keys.S)) ||
+            (keyboard.IsKeyDown(Keys.Down) && previousKeyboard.IsKeyUp(Keys.Down)))
+        {
+            if (isOnGround && !isRolling)
+            {
+                StartRoll();
+            }
+        }
+
+        if (isRolling)
+        {
+            rollTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (rollTimer <= 0)
+            {
+                isRolling = false;
+            }
+        }
+
         //gravity
 
         velocity += gravity; 
@@ -71,6 +103,12 @@ class Player
         isOnGround = false;
     }
 
+    public void StartRoll()
+    {
+        isRolling = true;
+        rollTimer = rollDuration;
+    }
+
     public void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(texture, GetBounds(), Color.Orange);
@@ -78,6 +116,11 @@ class Player
 
     public Rectangle GetBounds() //collider
     {
+        if (isRolling)
+        {
+            return new Rectangle((int)position.X, (int)position.Y + (height - rollHeight), width, rollHeight); // only upper bound needs to get down
+        }
+
         return new Rectangle((int)position.X, (int)position.Y, width, height);
     }
 

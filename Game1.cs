@@ -13,6 +13,7 @@ public class Game1 : Game
     private Player player;
     private float groundY = 480;
 
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -22,6 +23,7 @@ public class Game1 : Game
 
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        
     }
 
     protected override void Initialize()
@@ -50,7 +52,7 @@ public class Game1 : Game
 
         // TODO: Add your update logic here
         
-        player.Update();
+        player.Update(gameTime);
         base.Update(gameTime);
     }
 
