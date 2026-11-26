@@ -38,14 +38,37 @@ class Player
         KeyboardState keyboard = Keyboard.GetState();
 
         //jump
+
+        if ((keyboard.IsKeyDown(Keys.Space) && previousKeyboard.IsKeyUp(Keys.Space)) ||
+            (keyboard.IsKeyDown(Keys.W) && previousKeyboard.IsKeyUp(Keys.W)) ||
+            (keyboard.IsKeyDown(Keys.Up) && previousKeyboard.IsKeyUp(Keys.Up)))
+        {
+            if (isOnGround)
+            {
+                Jump();
+            }
+        }
         //gravity
 
+        velocity += gravity; 
+        position.Y += velocity;
+
         previousKeyboard = keyboard;
+
+        //ground check
+
+        if (position.Y + height > groundY)
+        {
+            position.Y = groundY - height;
+            velocity = 0;
+            isOnGround = true;
+        }
     }
 
     public void Jump()
     {
-        
+        velocity = jumpStrength;
+        isOnGround = false;
     }
 
     public void Draw(SpriteBatch spriteBatch)

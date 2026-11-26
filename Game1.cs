@@ -9,10 +9,14 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    private Texture2D pixel;
+    private Player player;
+    private float groundY = 480;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
-       
+
         _graphics.PreferredBackBufferWidth = 800;
         _graphics.PreferredBackBufferHeight = 600;
 
@@ -31,7 +35,12 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
+        pixel = new Texture2D(GraphicsDevice, 1, 1); //for prototype
+        pixel.SetData(new Color[] { Color.White });
+
+        player = new Player(pixel, new Vector2(120, groundY - 110), groundY);
+
+
     }
 
     protected override void Update(GameTime gameTime)
@@ -40,7 +49,8 @@ public class Game1 : Game
             Exit();
 
         // TODO: Add your update logic here
-
+        
+        player.Update();
         base.Update(gameTime);
     }
 
@@ -49,6 +59,13 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+
+        _spriteBatch.Begin();
+        
+        _spriteBatch.Draw(pixel, new Rectangle(0, (int)groundY, 800, 600 - (int)groundY), Color.Brown);
+        player.Draw(_spriteBatch);
+        
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }
