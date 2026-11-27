@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 class Player
 {
@@ -17,8 +16,6 @@ class Player
 
     private bool isRolling;
     private int rollHeight;
-
-    private KeyboardState  previousKeyboard;
 
     //constructor with parameters
 
@@ -39,24 +36,16 @@ class Player
         rollHeight = 55;
     }
     
-    public void Update(GameTime gameTime)
+    public void Update(GameTime gameTime, InputManager input)
     {
-        KeyboardState keyboard = Keyboard.GetState();
-
         //jump
-
-        if ((keyboard.IsKeyDown(Keys.Space) && previousKeyboard.IsKeyUp(Keys.Space)) ||
-            (keyboard.IsKeyDown(Keys.W) && previousKeyboard.IsKeyUp(Keys.W)) ||
-            (keyboard.IsKeyDown(Keys.Up) && previousKeyboard.IsKeyUp(Keys.Up)))
+        if (input.IsJumpPressed() && isOnGround && !isRolling)
         {
-            if (isOnGround && !isRolling)
-            {
-                Jump();
-            }
+            Jump();
         }
 
-        // edited roll
-        if ((keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down)) && isOnGround)
+        //roll
+        if (input.IsRollHeld() && isOnGround)
         {
             isRolling = true;
         }
@@ -64,13 +53,11 @@ class Player
         {
             isRolling = false;
         }
-
+        
         //gravity
-
         velocity += gravity; 
         position.Y += velocity;
 
-        previousKeyboard = keyboard;
 
         //ground check
 

@@ -16,6 +16,8 @@ public class Game1 : Game
     private ObstacleSpawner obstacleSpawner;
     private bool isGameOver;
 
+    private InputManager inputManager;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -48,6 +50,8 @@ public class Game1 : Game
 
         isGameOver = false;
 
+        inputManager = new InputManager();
+
 
     }
 
@@ -55,10 +59,12 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-    
+
+        inputManager.Update();
+
         if (!isGameOver)
         {
-            player.Update(gameTime);
+            player.Update(gameTime, inputManager);
             obstacleSpawner.Update(gameTime);
 
             //stop game if collision
