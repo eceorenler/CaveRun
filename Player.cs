@@ -15,9 +15,12 @@ class Player
     private float groundY;
     private bool isOnGround;
 
+    private bool isRolling;
+    private int rollHeight;
+
     private KeyboardState  previousKeyboard;
 
-    //Constructor with Parameters
+    //constructor with parameters
 
     public Player(Texture2D texture, Vector2 startPosition, float groundY)
     {
@@ -29,11 +32,14 @@ class Player
         height = 110;
         velocity = 0;
         gravity = 0.5f;
-        jumpStrength = -12f;
+        jumpStrength = -14f;
         isOnGround = true;
+
+        isRolling = false;
+        rollHeight = 55;
     }
     
-    public void Update()
+    public void Update(GameTime gameTime)
     {
         KeyboardState keyboard = Keyboard.GetState();
 
@@ -43,11 +49,22 @@ class Player
             (keyboard.IsKeyDown(Keys.W) && previousKeyboard.IsKeyUp(Keys.W)) ||
             (keyboard.IsKeyDown(Keys.Up) && previousKeyboard.IsKeyUp(Keys.Up)))
         {
-            if (isOnGround)
+            if (isOnGround && !isRolling)
             {
                 Jump();
             }
         }
+
+        // edited roll
+        if ((keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down)) && isOnGround)
+        {
+            isRolling = true;
+        }
+        else
+        {
+            isRolling = false;
+        }
+
         //gravity
 
         velocity += gravity; 
@@ -71,6 +88,7 @@ class Player
         isOnGround = false;
     }
 
+
     public void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Draw(texture, GetBounds(), Color.Orange);
@@ -78,6 +96,11 @@ class Player
 
     public Rectangle GetBounds() //collider
     {
+        if (isRolling)
+        {
+            return new Rectangle((int)position.X, (int)position.Y + (height - rollHeight), width, rollHeight); // only upper bound needs to get down
+        }
+
         return new Rectangle((int)position.X, (int)position.Y, width, height);
     }
 

@@ -13,6 +13,10 @@ public class Game1 : Game
     private Player player;
     private float groundY = 480;
 
+    private Obstacle groundObstacle;
+    private Obstacle flyingObstacle;
+    private bool isGameOver;
+
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -22,6 +26,7 @@ public class Game1 : Game
 
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+        
     }
 
     protected override void Initialize()
@@ -40,6 +45,11 @@ public class Game1 : Game
 
         player = new Player(pixel, new Vector2(120, groundY - 110), groundY);
 
+        groundObstacle = new Obstacle(pixel, 800, groundY, false);
+        flyingObstacle = new Obstacle(pixel, 1300, groundY, true);
+
+        isGameOver = false;
+
 
     }
 
@@ -47,16 +57,34 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+    
+        if (!isGameOver)
+        {
+            player.Update(gameTime);
+            groundObstacle.Update();
+            flyingObstacle.Update();
 
-        // TODO: Add your update logic here
-        
-        player.Update();
+            //stop game if collision
+            if (player.GetBounds().Intersects(groundObstacle.GetBounds()) ||
+                player.GetBounds().Intersects(flyingObstacle.GetBounds()))
+            {
+                isGameOver = true;
+            }
+        }
+
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        if (isGameOver)
+        {
+            GraphicsDevice.Clear(Color.DarkRed);
+        }
+        else
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+        }
 
         // TODO: Add your drawing code here
 
@@ -64,6 +92,9 @@ public class Game1 : Game
         
         _spriteBatch.Draw(pixel, new Rectangle(0, (int)groundY, 800, 600 - (int)groundY), Color.Brown);
         player.Draw(_spriteBatch);
+
+        groundObstacle.Draw(_spriteBatch);
+        flyingObstacle.Draw(_spriteBatch);
         
         _spriteBatch.End();
 
