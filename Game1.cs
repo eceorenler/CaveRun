@@ -13,9 +13,10 @@ public class Game1 : Game
     private Player player;
     private float groundY = 480;
 
-    private Obstacle groundObstacle;
-    private Obstacle flyingObstacle;
+    private ObstacleSpawner obstacleSpawner;
     private bool isGameOver;
+
+    private InputManager inputManager;
 
     public Game1()
     {
@@ -45,10 +46,11 @@ public class Game1 : Game
 
         player = new Player(pixel, new Vector2(120, groundY - 110), groundY);
 
-        groundObstacle = new Obstacle(pixel, 800, groundY, false);
-        flyingObstacle = new Obstacle(pixel, 1300, groundY, true);
+        obstacleSpawner = new ObstacleSpawner(pixel, groundY);
 
         isGameOver = false;
+
+        inputManager = new InputManager();
 
 
     }
@@ -57,19 +59,20 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-    
+
+        inputManager.Update();
+
         if (!isGameOver)
         {
-            player.Update(gameTime);
-            groundObstacle.Update();
-            flyingObstacle.Update();
+            player.Update(gameTime, inputManager);
+            obstacleSpawner.Update(gameTime);
 
             //stop game if collision
-            if (player.GetBounds().Intersects(groundObstacle.GetBounds()) ||
-                player.GetBounds().Intersects(flyingObstacle.GetBounds()))
+            if (obstacleSpawner.CheckCollision(player.GetBounds()))
             {
                 isGameOver = true;
             }
+
         }
 
         base.Update(gameTime);
@@ -93,8 +96,7 @@ public class Game1 : Game
         _spriteBatch.Draw(pixel, new Rectangle(0, (int)groundY, 800, 600 - (int)groundY), Color.Brown);
         player.Draw(_spriteBatch);
 
-        groundObstacle.Draw(_spriteBatch);
-        flyingObstacle.Draw(_spriteBatch);
+        obstacleSpawner.Draw(_spriteBatch);
         
         _spriteBatch.End();
 

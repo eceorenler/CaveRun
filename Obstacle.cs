@@ -34,11 +34,6 @@ class Obstacle
     {
         position.X -= speed;
 
-        //temp test
-        if (position.X + width < 0)
-        {
-            position.X = 1000;
-        }
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -57,6 +52,11 @@ class Obstacle
     {
         return new Rectangle((int)position.X, (int)position.Y, width, height);
     }    
+
+    public bool IsOffScreen()
+    {
+        return position.X + width < 0;
+    }
 
     
     
