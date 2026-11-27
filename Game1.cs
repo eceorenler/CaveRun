@@ -4,19 +4,27 @@ using Microsoft.Xna.Framework.Input;
 
 namespace CaveRun;
 
+enum GameState
+{
+    MainMenu,
+    CharacterSelect,
+    Playing,
+    Win,
+    GameOver
+}
 public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
     private Texture2D pixel;
-    private Player player;
     private float groundY = 480;
 
-    private ObstacleSpawner obstacleSpawner;
-    private bool isGameOver;
-
     private InputManager inputManager;
+
+    private GameplayScreen gameplayScreen;
+    private GameState currentState;
+
 
     public Game1()
     {
@@ -44,13 +52,10 @@ public class Game1 : Game
         pixel = new Texture2D(GraphicsDevice, 1, 1); //for prototype
         pixel.SetData(new Color[] { Color.White });
 
-        player = new Player(pixel, new Vector2(120, groundY - 110), groundY);
-
-        obstacleSpawner = new ObstacleSpawner(pixel, groundY);
-
-        isGameOver = false;
-
         inputManager = new InputManager();
+
+        gameplayScreen = new GameplayScreen(pixel, groundY);
+        currentState = GameState.Playing; //since there is no main menu, for testing
 
 
     }
@@ -62,17 +67,23 @@ public class Game1 : Game
 
         inputManager.Update();
 
-        if (!isGameOver)
+        if (currentState == GameState.Playing)
         {
-            player.Update(gameTime, inputManager);
-            obstacleSpawner.Update(gameTime);
+            gameplayScreen.Update(gameTime, inputManager);
 
-            //stop game if collision
-            if (obstacleSpawner.CheckCollision(player.GetBounds()))
+            if (gameplayScreen.IsGameOver())
             {
-                isGameOver = true;
+                currentState = GameState.GameOver;
             }
-
+        }
+        else if (currentState == GameState.GameOver)
+        {
+            //for testing
+            if (inputManager.IsKeyPressed(Keys.R))
+            {
+                gameplayScreen.Reset();
+                currentState = GameState.Playing;
+            }
         }
 
         base.Update(gameTime);
@@ -80,7 +91,7 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        if (isGameOver)
+        if (currentState == GameState.GameOver)
         {
             GraphicsDevice.Clear(Color.DarkRed);
         }
@@ -93,11 +104,8 @@ public class Game1 : Game
 
         _spriteBatch.Begin();
         
-        _spriteBatch.Draw(pixel, new Rectangle(0, (int)groundY, 800, 600 - (int)groundY), Color.Brown);
-        player.Draw(_spriteBatch);
+        gameplayScreen.Draw(_spriteBatch);
 
-        obstacleSpawner.Draw(_spriteBatch);
-        
         _spriteBatch.End();
 
         base.Draw(gameTime);
