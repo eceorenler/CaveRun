@@ -16,13 +16,11 @@ class Player
     private bool isOnGround;
 
     private bool isRolling;
-    private float rollTimer;
-    private float rollDuration;
     private int rollHeight;
 
     private KeyboardState  previousKeyboard;
 
-    //Constructor with Parameters
+    //constructor with parameters
 
     public Player(Texture2D texture, Vector2 startPosition, float groundY)
     {
@@ -34,12 +32,10 @@ class Player
         height = 110;
         velocity = 0;
         gravity = 0.5f;
-        jumpStrength = -12f;
+        jumpStrength = -14f;
         isOnGround = true;
 
         isRolling = false;
-        rollTimer = 0;
-        rollDuration = 0.6f;
         rollHeight = 55;
     }
     
@@ -59,25 +55,14 @@ class Player
             }
         }
 
-        //roll
-
-        if ((keyboard.IsKeyDown(Keys.S) && previousKeyboard.IsKeyUp(Keys.S)) ||
-            (keyboard.IsKeyDown(Keys.Down) && previousKeyboard.IsKeyUp(Keys.Down)))
+        // edited roll
+        if ((keyboard.IsKeyDown(Keys.S) || keyboard.IsKeyDown(Keys.Down)) && isOnGround)
         {
-            if (isOnGround && !isRolling)
-            {
-                StartRoll();
-            }
+            isRolling = true;
         }
-
-        if (isRolling)
+        else
         {
-            rollTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (rollTimer <= 0)
-            {
-                isRolling = false;
-            }
+            isRolling = false;
         }
 
         //gravity
@@ -103,11 +88,6 @@ class Player
         isOnGround = false;
     }
 
-    public void StartRoll()
-    {
-        isRolling = true;
-        rollTimer = rollDuration;
-    }
 
     public void Draw(SpriteBatch spriteBatch)
     {
