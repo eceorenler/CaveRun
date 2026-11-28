@@ -7,14 +7,12 @@ class Obstacle
     private Vector2 position;
     private int width;
     private int height;
-    private float speed;
     private bool isFlying;
 
     public Obstacle(Texture2D texture, float startX, float groundY, bool isFlying)
     {
         this.texture = texture;
         this.isFlying = isFlying;
-        speed = 5f;
 
         if (isFlying)
         {
@@ -30,7 +28,7 @@ class Obstacle
         }
     }
 
-    public void Update()
+    public void Update(float speed)
     {
         position.X -= speed;
 

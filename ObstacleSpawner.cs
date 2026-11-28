@@ -10,9 +10,13 @@ class ObstacleSpawner
     private float groundY;
     private Random random;
 
-    private float spawnTimer; //first obstacle occurence
-    private float minInterval;
-    private float maxInterval;
+    private float currentSpeed;
+    private float maxSpeed;
+    private float acceleration;
+
+    private float distanceToNextSpawn;
+    private float minGap;
+    private float maxGap;
 
     public ObstacleSpawner(Texture2D texture, float groundY)
     {
@@ -22,25 +26,38 @@ class ObstacleSpawner
         obstacles = new List<Obstacle>();
         random = new Random();
 
-        minInterval = 1.2f;
-        maxInterval = 2.2f;
-        spawnTimer = 1.5f;
+        currentSpeed = 5f;
+        maxSpeed = 10f;
+        acceleration = 0.1f;    
+
+        minGap = 400; //in pixels
+        maxGap = 700;
+        distanceToNextSpawn = 300;  
     }
 
-    public void Update(GameTime gameTime)
+    public void Update(GameTime gameTime) 
     {
-        spawnTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds; //for new obstacles to occur
+        //speeds the game 
+        currentSpeed += acceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        if(spawnTimer <= 0)
+        if (currentSpeed > maxSpeed)
         {
-            SpawnObstacle();
-
-            spawnTimer = minInterval + (float)random.NextDouble()* (maxInterval - minInterval);
+            currentSpeed = maxSpeed;
         }
 
-        for (int i = obstacles.Count - 1; i >= 0; i--) //backwards for updating correctly
+
+        distanceToNextSpawn -= currentSpeed;
+
+        if (distanceToNextSpawn <= 0)
         {
-            obstacles[i].Update();
+            SpawnObstacle();
+            distanceToNextSpawn = minGap + (float)random.NextDouble() * (maxGap - minGap);
+        }
+
+
+        for (int i = obstacles.Count - 1; i >= 0; i--)
+        {
+            obstacles[i].Update(currentSpeed);
 
             if (obstacles[i].IsOffScreen())
             {
@@ -76,4 +93,8 @@ class ObstacleSpawner
         }
     }
     
+    public float GetSpeed()
+    {
+        return currentSpeed;
+    }
 }
